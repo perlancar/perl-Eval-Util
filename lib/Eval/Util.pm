@@ -11,7 +11,10 @@ our @EXPORT_OK = qw(
                        inside_eval
                        inside_block_eval
                        inside_string_eval
+                       eval_level
                );
+# XXX block_eval_level
+# XXX string_eval_level
 
 sub inside_eval {
     my $i = 0;
@@ -55,6 +58,21 @@ sub inside_string_eval {
     0;
 }
 
+sub eval_level {
+    my $i = 0;
+    my $level = 0;
+    while (1) {
+        my ($package, $filename, $line, $subroutine, $hasargs, $wantarray, $evaltext) = #, $is_require, $hints, $bitmask, $hinthash
+            caller($i);
+        last unless defined $package;
+        $i++;
+        if ($subroutine eq "(eval)" || defined $evaltext) {
+            $level++;
+        }
+    };
+    $level;
+}
+
 1;
 # ABSTRACT: Utilities related to eval()
 
@@ -64,6 +82,7 @@ sub inside_string_eval {
     inside_eval
     inside_block_eval
     inside_string_eval
+    eval_level
  );
 
  # will not print 'foo', but print 'bar' and 'baz'
@@ -80,6 +99,10 @@ sub inside_string_eval {
  say "foo" if inside_string_eval();
  eval { say "bar" if inside_string_eval() };
  eval q(say "baz" if inside_string_eval());
+
+ say eval_level(); # 0
+ eval { say eval_level() }; # 1
+ eval { eval { say eval_level() } }; # 2
 
 
 =head1 DESCRIPTION
