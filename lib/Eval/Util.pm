@@ -141,6 +141,13 @@ return false if code is only inside block eval. This is done via examining the
 stack trace and checking for frame with subroutine named C<(eval)> that has
 defined eval text.
 
+=head2 eval_level
+
+Usage: eval_level() => int
+
+Return 0 if running code is not inside any eval, 1 if inside one eval, 2 if
+inside two evals, and so on.
+
 
 =head1 SEE ALSO
 
